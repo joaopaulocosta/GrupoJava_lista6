@@ -358,43 +358,144 @@ public class Aplicacao {
 		if(conteudoArquivo == null)
 			return;
 		
-			//dividindo o stringBuffer em linhas
-			String[] linhas = conteudoArquivo.toString().split("\n");
-			for(String linha: linhas){
-				try{	/*exceção de leitura de arquivo, caso alguma linha esteja fora do padrão ela sera
-						escrita em um arquivo externo chamado logErros.txt */
-					
-					//divide a linha nas três partes que constituem a disciplina
-					String[] pedacosDisciplina = linha.split(";");
-		
-					int codigo = Integer.parseInt(pedacosDisciplina[0]);
-					
-					String nome = pedacosDisciplina[1];
-					
-					int cargaHoraria = Integer.parseInt(pedacosDisciplina[2]);
-					
-					//cria nova Disciplina
-					Disciplina novaDisciplina = new Disciplina(codigo ,nome ,cargaHoraria);
-					
-					bd.addDisciplina(novaDisciplina);
-					
-				}catch(NumberFormatException e){
-					try {	//exceção de criação de arquivo
-						FileWriter arq =  new FileWriter("logErros.txt", true);
-						PrintWriter gravarArq = new PrintWriter(arq);
-						gravarArq.printf(linha + "\n");
-						gravarArq.close();
-						arq.close();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-					
+		//dividindo o stringBuffer em linhas
+		String[] linhas = conteudoArquivo.toString().split("\n");
+		for(String linha: linhas){
+			try{	/*exceção de leitura de arquivo, caso alguma linha esteja fora do padrão ela sera
+					escrita em um arquivo externo chamado logErros.txt */
+				
+				//divide a linha nas três partes que constituem a disciplina
+				String[] pedacosDisciplina = linha.split(";");
+	
+				int codigo = Integer.parseInt(pedacosDisciplina[0]);
+				
+				String nome = pedacosDisciplina[1];
+				
+				int cargaHoraria = Integer.parseInt(pedacosDisciplina[2].trim());
+				
+				//cria nova Disciplina
+				Disciplina novaDisciplina = new Disciplina(codigo ,nome ,cargaHoraria);
+				
+				bd.addDisciplina(novaDisciplina);
+				
+			}catch(Exception e){
+				try {	//exceção de criação de arquivo
+					FileWriter arq =  new FileWriter("logErros.txt", true);
+					PrintWriter gravarArq = new PrintWriter(arq);
+					gravarArq.printf("%s\r\n",linha);
+					gravarArq.close();
+					arq.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
-			
+				
 			}
 		
+		}
 	}
 	
+	//funcao que trata o conteudo do arquivo e adiciona os alunos contidas nele
+	public static void lerArquivoAlunos(BD bd){
+		
+		StringBuilder conteudoArquivo = lerArquivo();
+		
+		//aborta de leitura de arquivo não foi bem sucedida
+		if(conteudoArquivo == null)
+			return;
+		
+		//dividindo o stringBuffer em linhas
+		String[] linhas = conteudoArquivo.toString().split("\n");
+		for(String linha: linhas){
+			try{	/*exceção de leitura de arquivo, caso alguma linha esteja fora do padrão ela sera
+					escrita em um arquivo externo chamado logErros.txt */
+				
+				//divide a linha nas três partes que constituem o objeto aluno
+				String[] pedacosAluno = linha.split(";");
+	
+				int codMatricula = Integer.parseInt(pedacosAluno[0]);
+				
+				String nome = pedacosAluno[1];
+				
+				String[] dataS = pedacosAluno[2].split("/");
+				Date data = new Date( dataS[1] + "/" + dataS[0] + "/" + dataS[2]);	
+
+				
+				//cria novo Aluno
+				Aluno novoAluno = new Aluno(codMatricula ,nome ,data);
+				
+				bd.addAluno(novoAluno); 
+				
+			}catch(Exception e){
+				try {	//exceção de criação de arquivo
+					FileWriter arq =  new FileWriter("logErros.txt", true);
+					PrintWriter gravarArq = new PrintWriter(arq);
+					gravarArq.printf("%s\r\n",linha);
+					gravarArq.close();
+					arq.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+			
+		
+		} 
+	}
+	
+	//funcao que trata o conteudo do arquivo e adiciona os professores contidos nele
+	public static void lerArquivoProfessores(BD bd){
+		
+		StringBuilder conteudoArquivo = lerArquivo();
+		
+		//aborta de leitura de arquivo não foi bem sucedida
+		if(conteudoArquivo == null)
+			return;
+		
+		//dividindo o stringBuffer em linhas
+		String[] linhas = conteudoArquivo.toString().split("\n");
+		for(String linha: linhas){
+			try{	/*exceção de leitura de arquivo, caso alguma linha esteja fora do padrão ela sera
+					escrita em um arquivo externo chamado logErros.txt */
+				
+				//divide a linha nas 5 partes de acordo com formato de arquito informado
+				String[] pedacosProfessor = linha.split(";");
+	
+				long cpf = Long.parseLong(pedacosProfessor[1]);
+				
+				String nome = pedacosProfessor[2];
+				
+				double salario = Double.parseDouble(pedacosProfessor[3]);
+				
+				String titulo = pedacosProfessor[4];
+
+				
+				//cria novo professor de acordo com primeiro parametro
+				Professor novoProfessor = null;
+				if(pedacosProfessor[0].equals("M"))
+					novoProfessor = new Mestre(cpf ,nome ,salario,titulo);
+				else if(pedacosProfessor[0].equals("D"))
+					novoProfessor = new Doutor(cpf ,nome ,salario,titulo);
+				
+				bd.addProfessor(novoProfessor); 
+				
+			}catch(Exception e){
+				try {	//exceção de criação de arquivo
+					FileWriter arq =  new FileWriter("logErros.txt", true);
+					PrintWriter gravarArq = new PrintWriter(arq);
+					gravarArq.printf("%s\r\n",linha);
+					gravarArq.close();
+					arq.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+			
+		
+		} 
+	}
+	
+	//funcao principal
 	public static void main(String [] args){
 		BD bd = new BD();
 		ler = new Scanner(System.in);
@@ -409,6 +510,8 @@ public class Aplicacao {
 			System.out.println("11 - Inserir Nota");
 			System.out.println("12 - Emitir Relatorio");
 			System.out.println("13 - Importar Disciplinas de Arquivo");
+			System.out.println("14 - Importar Alunos de Arquivo");
+			System.out.println("15 - Importar Professores de Arquivo");
 			System.out.println("0 - Sair");
 			
 			menu = Integer.parseInt(ler.nextLine());
@@ -478,6 +581,14 @@ public class Aplicacao {
 				case 13:
 					System.out.println("Lendo arquivo de disciplinas...");
 					lerArquivoDisciplinas(bd);
+					break;
+				case 14:
+					System.out.println("Lendo arquivo de alunos...");
+					lerArquivoAlunos(bd);
+					break;
+				case 15:
+					System.out.println("Lendo arquivo de professores...");
+					lerArquivoProfessores(bd);
 					break;
 				default:
 					if(menu != 0)
