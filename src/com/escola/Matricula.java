@@ -10,10 +10,19 @@ public final class Matricula {
 	private Aluno aluno;
 	
 	//Construtor----------------------------------------------------------------------
-	public Matricula(Disciplina disciplina, Aluno aluno, Integer pontuacao){
+	
+	//construtor com tratamento de exceção
+	public Matricula(Disciplina disciplina, Aluno aluno, Integer pontuacao) throws NotaException{
 		this.disciplina = disciplina;
 		this.aluno = aluno;
-		this.pontuacao = pontuacao;
+		
+		
+		if(pontuacao != null){		//evitando exceção de ponteiro
+			if(pontuacao > 100 || pontuacao < 0)
+				throw new NotaException(pontuacao);
+			else
+				this.pontuacao = pontuacao;
+		}
 	}
 	
 	//Metodos acessores----------------------------------------------------------------
@@ -29,8 +38,12 @@ public final class Matricula {
 		return this.disciplina;
 	}
 
-	public void setPontuacao(Integer pontuacao) {
-		this.pontuacao = pontuacao;
+	public void setPontuacao(Integer pontuacao) throws NotaException {
+		
+		if(pontuacao > 100 || pontuacao < 0)
+			throw new NotaException(pontuacao);
+		else
+			this.pontuacao = pontuacao;
 	}
 	
 	//Metodos Sobrescritos----------------------------------------------------------------

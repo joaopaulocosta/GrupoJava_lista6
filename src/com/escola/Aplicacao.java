@@ -1,6 +1,14 @@
 package com.escola;
 import java.util.Scanner;
 import java.util.Date;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.text.SimpleDateFormat;
 
 
@@ -167,8 +175,9 @@ public class Aplicacao {
 		return codigo;	
 	}
 	
+	//funcao que cria uma nova matricula
 	public static Matricula novaMatricula(BD bd){
-		Matricula matricula;
+		Matricula matricula = null;
 		
 		//para criação de matricula temos que ter um aluno e uma disciplina
 		Aluno aluno;
@@ -206,33 +215,37 @@ public class Aplicacao {
 		
 		//recebendo a nota
 		Integer nota = null;
+		//utilizei o numero -1 para ativar a opção "EM CURSO"
 		System.out.println("Entre com a nota do aluno, digite -1 caso ainda não exista");
 		try{
 			nota = Integer.parseInt(ler.nextLine());
 		}
 		catch(NumberFormatException e){
-			System.out.println("Formato de nota esta incorreto, tete novamente");
+			System.out.println("Formato de nota esta incorreto, tente novamente");
 			return null;
 		}
 		
 		
-		
-		if(nota >= 60)
-			System.out.println("APROVADO");
-		else if(nota < 60 && nota >= 0)
-			System.out.println("REPROVADO");
-		else{
-			System.out.println("EM CURSO");
-			nota = null;
-		}
-		
 		//criando objeto
-		matricula = new Matricula(disciplina, aluno, nota);
-		
+		//verificando se exceção é ativada
+		try{
+			matricula = new Matricula(disciplina, aluno, nota);
+			if(nota >= 60)
+				System.out.println("APROVADO");
+			else if(nota < 60 && nota >= 0)
+				System.out.println("REPROVADO");
+			else if(nota == -1){					//caso nota == -1 excessão não será ativada
+				System.out.println("EM CURSO");
+				nota = null;
+			}
+		}catch(NotaException e){
+			System.out.println(e.getMessage());
+		}
 		
 		return matricula;
 	}
 	
+	//função que inseri a nota de matricula ja cadastrada
 	public static void inserirNota(BD bd){
 		Matricula matricula;
 		
@@ -290,13 +303,96 @@ public class Aplicacao {
 			return;
 		}
 		
-		matricula.setPontuacao(nota);
+		try{
+			matricula.setPontuacao(nota);
+			if(nota >= 60)
+				System.out.println("APROVADO");
+			else if(nota < 60)
+				System.out.println("REPROVADO");
+		}catch(NotaException e){
+			System.out.println(e.getMessage());
+		}
 		
-		if(nota >= 60)
-			System.out.println("APROVADO");
-		else if(nota < 60)
-			System.out.println("REPROVADO");
+		
 
+	}
+	
+	//funcao generica para leitura de arquivo, retorna uma StringBuilder com o conteúdo
+	public static StringBuilder lerArquivo(){
+		
+		StringBuilder conteudoArquivo = new StringBuilder();
+		
+		System.out.println("Entre com o nome do arquivo: ");
+		String nomeArquivo = ler.nextLine();
+		
+		//leitura do arquivo de entrada
+				try{
+					
+					File arquivo = new File(nomeArquivo);
+					Reader in = new FileReader( arquivo);
+					LineNumberReader reader = new LineNumberReader(in);
+					while(reader.ready()){
+						conteudoArquivo.append(reader.readLine() + "\n");
+					}
+					reader.close();
+					in.close();
+				
+				//tratamento de escessoes
+				} catch (java.io.FileNotFoundException e){
+					System.out.println("Arq. nao existe. Causa: " + e.getMessage());
+					return null;
+				} catch (java.io.IOException e) {
+					System.out.println( "Erro de E/S. Causa: " + e.getMessage() );
+					return null;
+				}
+		
+		return conteudoArquivo;
+}
+	
+	//funcao que trata o conteudo do arquivo e adiciona as disciplinas contidas nele
+	public static void lerArquivoDisciplinas(BD bd){
+		
+		StringBuilder conteudoArquivo = lerArquivo();
+		
+		//aborta de leitura de arquivo não foi bem sucedida
+		if(conteudoArquivo == null)
+			return;
+		
+			//dividindo o stringBuffer em linhas
+			String[] linhas = conteudoArquivo.toString().split("\n");
+			for(String linha: linhas){
+				try{	/*exceção de leitura de arquivo, caso alguma linha esteja fora do padrão ela sera
+						escrita em um arquivo externo chamado logErros.txt */
+					
+					//divide a linha nas três partes que constituem a disciplina
+					String[] pedacosDisciplina = linha.split(";");
+		
+					int codigo = Integer.parseInt(pedacosDisciplina[0]);
+					
+					String nome = pedacosDisciplina[1];
+					
+					int cargaHoraria = Integer.parseInt(pedacosDisciplina[2]);
+					
+					//cria nova Disciplina
+					Disciplina novaDisciplina = new Disciplina(codigo ,nome ,cargaHoraria);
+					
+					bd.addDisciplina(novaDisciplina);
+					
+				}catch(NumberFormatException e){
+					try {	//exceção de criação de arquivo
+						FileWriter arq =  new FileWriter("logErros.txt", true);
+						PrintWriter gravarArq = new PrintWriter(arq);
+						gravarArq.printf(linha + "\n");
+						gravarArq.close();
+						arq.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
+				}
+			
+			}
+		
 	}
 	
 	public static void main(String [] args){
@@ -305,19 +401,14 @@ public class Aplicacao {
 		int menu = -1, matricula, codigo;
 		long cpf;
 		while(menu != 0){
-			System.out.println("Menu");
-			System.out.println("1 - Incluir aluno");
-			System.out.println("2 - Excluir aluno");
-			System.out.println("3 - Listar aluno");
-			System.out.println("4 - Incluir Professor");
-			System.out.println("5 - Excluir Professor");
-			System.out.println("6 - Listar Professor");
-			System.out.println("7 - Incluir Disciplina");
-			System.out.println("8 - Excluir Disciplina");
-			System.out.println("9 - Listar Disciplina");
-			System.out.println("10 - Matricular");
+			System.out.println("Menu - Selecione a opcao desejada:");
+			System.out.println("1 - Incluir aluno, 2 - Excluir aluno, 3 - listar aluno");
+			System.out.println("4 - Incluir Professor, 5 - Excluir Professor, 6 - listar Professor");
+			System.out.println("7 - Incluir Disciplina, 8 - Excluir Disciplina, 9- Listar Disciplina");
+			System.out.println("10 - Criar Matricula");
 			System.out.println("11 - Inserir Nota");
 			System.out.println("12 - Emitir Relatorio");
+			System.out.println("13 - Importar Disciplinas de Arquivo");
 			System.out.println("0 - Sair");
 			
 			menu = Integer.parseInt(ler.nextLine());
@@ -380,11 +471,17 @@ public class Aplicacao {
 				case 11:
 					System.out.println("Inserindo nota...");
 					inserirNota(bd);
-					break;
-					
+					break;		
 				case 12:
 					System.out.println(bd.gerarBackup());
 					break;
+				case 13:
+					System.out.println("Lendo arquivo de disciplinas...");
+					lerArquivoDisciplinas(bd);
+					break;
+				default:
+					if(menu != 0)
+						System.out.println("Opção inválida");
 			}
 			
 		}

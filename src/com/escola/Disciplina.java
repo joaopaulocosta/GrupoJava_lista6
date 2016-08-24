@@ -19,7 +19,14 @@ public final class Disciplina {
 		this.nome = nome;
 		this.cargaHoraria = cargaHoraria;
 		this.professor = professor;
-		//this.listaMatriculas = new ArrayList<Matricula>();
+	}
+	
+	//construtor para disciplina sem professor (disciplinas lidas do arquivo)
+	public Disciplina(int codigo, String nome, int cargaHoraria){
+		this.codigo = codigo;
+		this.nome = nome;
+		this.cargaHoraria = cargaHoraria;
+		this.professor = null;
 	}
 	
 	//Metodos acessores----------------------------------------------------------------
@@ -46,8 +53,12 @@ public final class Disciplina {
 	//Metodos Sobrescritos----------------------------------------------------------------
 		@Override
 		public String toString(){
-			return this.codigo + ";" + this.nome + 
-					";" + this.getCargaHoraria() + ";" + this.professor.getCpf();
+			if(this.professor != null)
+				return this.codigo + ";" + this.nome + 
+						";" + this.getCargaHoraria() + ";" + this.professor.getCpf();
+			else
+				return this.codigo + ";" + this.nome + 
+						";" + this.getCargaHoraria() ;
 		}
 		
 		@Override
