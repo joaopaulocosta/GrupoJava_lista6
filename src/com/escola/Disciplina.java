@@ -1,7 +1,8 @@
 package com.escola;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public final class Disciplina {
+public final class Disciplina implements Serializable {
 	
 	//atributos-----------------------------------------------------------------------
 	private int codigo;

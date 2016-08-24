@@ -17,6 +17,22 @@ public class BD {
 		listaMatriculas = new ArrayList<Matricula>();
 	}
 
+	public ArrayList<Aluno> getListaAlunos(){
+		return listaAlunos;
+	}
+	
+	public ArrayList<Professor> getListaProfessores(){
+		return listaProfessores;
+	}
+	
+	public ArrayList<Disciplina> getListaDisciplinas(){
+		return listaDisciplinas;
+	}
+	
+	public ArrayList<Matricula> getListaMatriculas(){
+		return listaMatriculas;
+	}
+	
 //Metodos de inclusao---------------------------------------------------------------------------------------------------
 	
 	public void addDisciplina(Disciplina novaDisciplina){

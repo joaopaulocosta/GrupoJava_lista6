@@ -1,6 +1,8 @@
 package com.escola;
 
-public final class Matricula {
+import java.io.Serializable;
+
+public final class Matricula implements Serializable {
 	
 	//atributos-----------------------------------------------------------------------
 	private Integer pontuacao;

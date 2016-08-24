@@ -1,3 +1,8 @@
 003;Fundamentos Teóricos da Computação;120 
 100s01;Carlos Alberto;05/08/1990
 10003;Lucas Almeida;12-30-1985
+10003;Lucas Almeida;12-30-1985
+10003;Lucas Almeida;12-30-1985
+10003;Lucas Almeida;12-30-1985
+10003;Lucas Almeida;12-30-1985
+10003;Lucas Almeida;12-30-1985

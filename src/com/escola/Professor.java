@@ -1,10 +1,11 @@
 
 package com.escola;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Professor {
+public abstract class Professor implements Serializable {
 	
 	//atributos-----------------------------------------------------------------------
 	private final  Long cpf;
@@ -46,7 +47,7 @@ public abstract class Professor {
 	//Metodos Sobrescritos----------------------------------------------------------------
 			@Override
 			public String toString(){
-				return this.cpf + ";" + this.nome + ";" + this.getSalario() + ";";
+				return this.cpf + ";" + this.nome + ";" + this.getSalario() ;
 				//padrao de string pedido no enunciado
 			}
 			

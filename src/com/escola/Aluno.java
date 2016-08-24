@@ -1,10 +1,11 @@
 package com.escola;
 import java.util.Date;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 
 
-public final class Aluno {
+public final class Aluno implements Serializable{
 	
 //atributos--------------------------------------------------------------------------------------------------------------
 	private final int matricula;

@@ -2,11 +2,17 @@ package com.escola;
 import java.util.Scanner;
 import java.util.Date;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
@@ -495,12 +501,104 @@ public class Aplicacao {
 		} 
 	}
 	
+	//função que ira salvar os dados antes de sair da aplicação
+	public static void salvarDados(BD bd){
+		try {
+				File file = new File( "data.bin" );
+				FileOutputStream out = new FileOutputStream( file );
+				ObjectOutput objectOut = new ObjectOutputStream( out );
+				
+				//gravando dados de alunos no arquivo binario
+				objectOut.writeInt(bd.getListaAlunos().size());
+				for(Aluno aluno: bd.getListaAlunos()){
+					objectOut.writeObject(aluno);
+				}
+				//gravando dados de professores no arquivo binario
+				objectOut.writeInt(bd.getListaProfessores().size());
+				for(Professor professor: bd.getListaProfessores()){
+					objectOut.writeObject(professor);
+				}
+				//gravando dados das disciplinas no arquivo binario
+				objectOut.writeInt(bd.getListaDisciplinas().size());
+				for(Disciplina disciplina: bd.getListaDisciplinas()){
+					objectOut.writeObject(disciplina);
+				}
+				
+				//gravando dados das matriculas no arquivo binario
+				objectOut.writeInt(bd.getListaMatriculas().size());
+				for(Matricula matricula: bd.getListaMatriculas()){
+					objectOut.writeObject(matricula);
+				} 
+				
+				objectOut. close();
+				out. close();
+				
+			} catch (FileNotFoundException e) {
+				System.out.println( "Arq. nao existe. " + e.getMessage() );
+			} catch (IOException e) {
+				System.out.println( "Erro de E/S. Causa: " + e.getMessage() );
+			} catch (Exception e) {
+				System.out.println( "Erro ao gravar arquivo. " + e.getMessage() );
+			}
+	}
+	
+	//função que ira importar dados binarios de arquivo ao iniciar o programa
+	public static void carregandoDados(BD bd){
+		try {
+			File file = new File( "data.bin" );
+			FileInputStream in = new FileInputStream( file );
+			ObjectInput objectIn = new ObjectInputStream( in );
+			
+			//lendo alunos de arquivo binario
+			int tam = objectIn.readInt();
+			for(int i = 0; i< tam; i++){
+				Aluno novoAluno = (Aluno) objectIn.readObject();
+				bd.addAluno(novoAluno);
+			}
+			
+			//lendo professores de arquivo binario
+			tam = objectIn.readInt();
+			for(int i = 0; i< tam; i++){
+				Professor novoProfessor = (Professor) objectIn.readObject();
+				bd.addProfessor(novoProfessor);
+			}
+			
+			//lendo disciplinas de arquivo binario
+			tam = objectIn.readInt();
+			for(int i = 0; i< tam; i++){
+				Disciplina novaDisciplina = (Disciplina) objectIn.readObject();
+				bd.addDisciplina(novaDisciplina);
+			}
+			
+			//lendo matricula de arquivo binario
+			tam = objectIn.readInt();
+			for(int i = 0; i< tam; i++){
+				Matricula novaMatricula = (Matricula) objectIn.readObject();
+				bd.addMatricula(novaMatricula);
+			}
+			
+			
+			
+			objectIn. close();
+			in. close();
+			
+		} catch (FileNotFoundException e) {
+			System.out.println( "Arq. nao existe. " + e.getMessage() );
+		} catch (IOException e) {
+			System.out.println( "Erro de E/S. Causa: " + e.getMessage() );
+		} catch (Exception e) {
+			System.out.println( "Erro ao ler arquivo. " + e.getMessage() );
+		}
+	}
+	
 	//funcao principal
 	public static void main(String [] args){
 		BD bd = new BD();
 		ler = new Scanner(System.in);
 		int menu = -1, matricula, codigo;
 		long cpf;
+		System.out.println("Carregando Arquivos...");
+		carregandoDados(bd);
 		while(menu != 0){
 			System.out.println("Menu - Selecione a opcao desejada:");
 			System.out.println("1 - Incluir aluno, 2 - Excluir aluno, 3 - listar aluno");
@@ -591,8 +689,13 @@ public class Aplicacao {
 					lerArquivoProfessores(bd);
 					break;
 				default:
-					if(menu != 0)
+					if(menu != 0){
 						System.out.println("Opção inválida");
+					}
+					else{
+						System.out.println("Finalizando e salvando dados...");
+						salvarDados(bd);
+					}
 			}
 			
 		}
