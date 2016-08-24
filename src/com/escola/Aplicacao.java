@@ -234,8 +234,7 @@ public class Aplicacao {
 		
 		//criando objeto
 		//verificando se exceção é ativada
-		try{
-			matricula = new Matricula(disciplina, aluno, nota);
+		try{	
 			if(nota >= 60)
 				System.out.println("APROVADO");
 			else if(nota < 60 && nota >= 0)
@@ -244,6 +243,7 @@ public class Aplicacao {
 				System.out.println("EM CURSO");
 				nota = null;
 			}
+			matricula = new Matricula(disciplina, aluno, nota);
 		}catch(NotaException e){
 			System.out.println(e.getMessage());
 		}
@@ -590,6 +590,7 @@ public class Aplicacao {
 			System.out.println( "Erro ao ler arquivo. " + e.getMessage() );
 		}
 	}
+	
 	
 	//funcao principal
 	public static void main(String [] args){

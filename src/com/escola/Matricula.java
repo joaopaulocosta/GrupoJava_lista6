@@ -20,7 +20,7 @@ public final class Matricula implements Serializable {
 		
 		
 		if(pontuacao != null){		//evitando exceção de ponteiro
-			if(pontuacao > 100 || pontuacao < 0)
+			if(pontuacao > 100 || pontuacao <= -1)
 				throw new NotaException(pontuacao);
 			else
 				this.pontuacao = pontuacao;

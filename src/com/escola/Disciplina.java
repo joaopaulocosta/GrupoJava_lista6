@@ -42,6 +42,7 @@ public final class Disciplina implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+	
 
 	public int getCargaHoraria() {
 		return this.cargaHoraria;
